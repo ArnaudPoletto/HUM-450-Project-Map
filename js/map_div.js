@@ -153,7 +153,8 @@ class DivisionsMap {
                 .attr("cy", d => this.projection(d[1])[1])
                 .attr("r", 2)
                 .attr("fill", "black")
-                .style("pointer-events", "none");
+                .style("pointer-events", "none")
+                .style("z-index", "1000");
 
             this.g.selectAll("text")
                 .data(data)
@@ -166,7 +167,9 @@ class DivisionsMap {
                 .style("font-size", "6px")
                 .style("fill", "black")
                 .style("text-anchor", "middle")
-                .style("pointer-events", "none");
+                .style("pointer-events", "none")
+                .style("font-family", "sans-serif")
+                .style("z-index", "1000");
         });
     }
 

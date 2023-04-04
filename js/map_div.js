@@ -1,9 +1,10 @@
 class LausanneMap {
     constructor(
         map_file,
-        scale = 300000,
-        center = [6.65, 46.55],
-        min_zoom_dimension = 50,
+        locations_file,
+        scale = 700000,
+        center = [6.635, 46.525],
+        min_zoom_dimension = 100,
         default_zone_color = "grey",
         zone_colors = {
             "vigne": "#9BA17B",
@@ -20,6 +21,7 @@ class LausanneMap {
         }
     ) {
         this.map_file = map_file;
+        this.locations_file = locations_file;
 
         // Basic render settings
         this.scale = scale;
@@ -83,6 +85,7 @@ class LausanneMap {
         return d3.geoPath().projection(this.projection);
     }
 
+    /*
     correctWindingOrder(data) {
         data.features.forEach(feature => {
             if (feature == null 
@@ -92,17 +95,20 @@ class LausanneMap {
                 ) {
                 return;
             }
-            let coordinates = feature.geometry.coordinates[0];
+
+            let coordinates = feature.geometry.coordinates[0][0];
 
             if (!turf.booleanClockwise(coordinates)) {
-                feature.geometry.coordinates[0].reverse();
+                feature.geometry.coordinates[0][0].reverse();
             }
         })
       }
+      */
 
     load_data() {
         d3.json(this.map_file).then(data => {
-            this.correctWindingOrder(data)
+            //this.correctWindingOrder(data)
+            console.log(data)
 
             this.g.selectAll("path")
                 .data(data.features)
@@ -133,6 +139,37 @@ class LausanneMap {
                     }
                     this.clicked_zone = this.is_zoomed ? d.target : null
                 });
+        });
+
+        this.load_locations()
+    }
+
+    load_locations() {
+        d3.json(this.locations_file).then(data => {
+            data = Object.entries(data);
+            console.log(data)
+            this.g.selectAll("circle")
+                .data(data)
+                .enter()
+                .append("circle")
+                .attr("cx", d => this.projection(d[1])[0])
+                .attr("cy", d => this.projection(d[1])[1])
+                .attr("r", 2)
+                .attr("fill", "black")
+                .style("pointer-events", "none");
+
+            this.g.selectAll("text")
+                .data(data)
+                .enter()
+                .append("text")
+                .attr("x", d => this.projection(d[1])[0])
+                .attr("y", d => this.projection(d[1])[1])
+                .attr("dy", -3)
+                .text(d => d[0])
+                .style("font-size", "6px")
+                .style("fill", "black")
+                .style("text-anchor", "middle")
+                .style("pointer-events", "none");
         });
     }
 
@@ -183,21 +220,28 @@ class LausanneMap {
     getZoneCenter(zone, project, return_borders) {
         const node = d3.select(zone).node()
         const bbox = node.getBBox()
-        let center2 = [bbox.x + bbox.width / 2, bbox.y + bbox.height / 2]
+        let center = [bbox.x + bbox.width / 2, bbox.y + bbox.height / 2]
         if(!project) {
-            center2 = this.projection.invert(center2) // invert projection
+            center = this.projection.invert(center) // invert projection
         }
 
-        return [center2, return_borders ? this.getZoneBorders(zone) : null]
+        return [center, return_borders ? this.getZoneBorders(zone, project) : null]
     }
 
-    getZoneBorders(zone) {
+    getZoneBorders(zone, project) {
         const node = d3.select(zone).node()
         const bbox = node.getBBox()
-        const bottom_left = this.projection.invert([bbox.x, bbox.y + bbox.height])
-        const bottom_right = this.projection.invert([bbox.x + bbox.width, bbox.y + bbox.height])
-        const top_left = this.projection.invert([bbox.x, bbox.y])
-        const top_right = this.projection.invert([bbox.x + bbox.width, bbox.y])
+        const bottom_left = [bbox.x, bbox.y + bbox.height]
+        const bottom_right = [bbox.x + bbox.width, bbox.y + bbox.height]
+        const top_left = [bbox.x, bbox.y]
+        const top_right = [bbox.x + bbox.width, bbox.y]
+
+        if (!project) {
+            bottom_left = this.projection.invert(bottom_left)
+            bottom_right = this.projection.invert(bottom_right)
+            top_left = this.projection.invert(top_left)
+            top_right = this.projection.invert(top_right)
+        }
 
         return [bottom_left, bottom_right, top_left, top_right]
     }
@@ -208,7 +252,7 @@ class LausanneMap {
             zone_obj = d3.select(zone).data()[0]
         }
 
-        let zone_title = zone_obj.properties.use
+        let zone_title = zone_obj.properties.name
         if (zone_title == null || zone_title == "" || zone_title == "nan") {
             zone_title = zone_obj.properties.class
         }
@@ -280,7 +324,10 @@ let map = null
 
 // run load_network() when page is loaded
 window.onload = function() {
-    map = new LausanneMap(map_file="data/berney.geojson")
+    map = new LausanneMap(
+        map_file="data/berney_divisions.geojson",
+        locations_file="data/locations.json"
+        )
     map.load_data()
 }
 

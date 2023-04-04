@@ -154,7 +154,7 @@ class DivisionsMap {
                 .attr("r", 2)
                 .attr("fill", "black")
                 .style("pointer-events", "none")
-                .style("z-index", "1000");
+                .raise();
 
             this.g.selectAll("text")
                 .data(data)
@@ -169,7 +169,7 @@ class DivisionsMap {
                 .style("text-anchor", "middle")
                 .style("pointer-events", "none")
                 .style("font-family", "sans-serif")
-                .style("z-index", "1000");
+                .raise();
         });
     }
 

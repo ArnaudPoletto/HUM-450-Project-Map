@@ -108,8 +108,6 @@ class DivisionsMap {
     load_data() {
         d3.json(this.map_file).then(data => {
             //this.correctWindingOrder(data)
-            console.log(data)
-
             this.g.selectAll("path")
                 .data(data.features)
                 .enter()
@@ -147,7 +145,6 @@ class DivisionsMap {
     load_locations() {
         d3.json(this.locations_file).then(data => {
             data = Object.entries(data);
-            console.log(data)
             this.g.selectAll("circle")
                 .data(data)
                 .enter()
@@ -630,7 +627,7 @@ window.onload = function() {
 
 // on space bar press, zoom out
 document.onkeydown = function(e) {
-    if (e.keyCode == 32) {
+    if (e.keyCode == 77) {
         // check type of map
         if (map instanceof LausanneMap) {
             map.unload_data();

@@ -64,7 +64,8 @@ class DivisionsMap {
         const zoom = d3.zoom()
         .scaleExtent([1, 8])
         .on("zoom", ({transform}) => {
-            this.g.attr("transform", transform);
+            this.layer_1.attr("transform", transform);
+            this.layer_2.attr("transform", transform);
         });
 
         this.svg.call(zoom);

@@ -154,8 +154,7 @@ class DivisionsMap {
                 .attr("cy", d => this.projection(d[1])[1])
                 .attr("r", 2)
                 .attr("fill", "black")
-                .style("pointer-events", "none")
-                .raise();
+                .style("pointer-events", "none");
 
             this.layer_2.selectAll("text")
                 .data(data)
@@ -169,8 +168,7 @@ class DivisionsMap {
                 .style("fill", "black")
                 .style("text-anchor", "middle")
                 .style("pointer-events", "none")
-                .style("font-family", "sans-serif")
-                .raise();
+                .style("font-family", "sans-serif");
         });
     }
 

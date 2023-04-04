@@ -36,7 +36,8 @@ class DivisionsMap {
 
         // Initialize map
         this.svg = this.init_svg();
-        this.g = this.init_g();
+        this.layer_1 = this.init_g();
+        this.layer_2 = this.init_g();
         this.projection = this.init_projection();
         this.zoom = this.init_zoom();
     }
@@ -108,7 +109,7 @@ class DivisionsMap {
     load_data() {
         d3.json(this.map_file).then(data => {
             //this.correctWindingOrder(data)
-            this.g.selectAll("path")
+            this.layer_1.selectAll("path")
                 .data(data.features)
                 .enter()
                 .append("path")
@@ -145,7 +146,7 @@ class DivisionsMap {
     load_locations() {
         d3.json(this.locations_file).then(data => {
             data = Object.entries(data);
-            this.g.selectAll("circle")
+            this.layer_2.selectAll("circle")
                 .data(data)
                 .enter()
                 .append("circle")
@@ -156,7 +157,7 @@ class DivisionsMap {
                 .style("pointer-events", "none")
                 .raise();
 
-            this.g.selectAll("text")
+            this.layer_2.selectAll("text")
                 .data(data)
                 .enter()
                 .append("text")
@@ -174,12 +175,14 @@ class DivisionsMap {
     }
 
     unload_data() {
-        this.g.selectAll("*").remove();
+        this.layer_1.selectAll("*").remove();
+        this.layer_2.selectAll("*").remove();
     }
 
     update_data(new_map_file) {
         this.map_file = new_map_file;
-        this.g.selectAll("*").remove();
+        this.layer_1.selectAll("*").remove();
+        this.layer_2.selectAll("*").remove();
         this.load_data();
     }
 
@@ -258,7 +261,7 @@ class DivisionsMap {
 
     addZoneTitle(zone, lat, long) {
         let zone_title = this.getZoneTitle(zone)
-        this.g.append("text")
+        this.layer_2.append("text")
             .attr("x", this.projection([lat, long])[0])
             .attr("y", this.projection([lat, long])[1])
             .attr("text-anchor", "middle")

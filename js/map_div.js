@@ -174,18 +174,6 @@ class DivisionsMap {
         this.g.selectAll("*").remove();
     }
 
-    color_zones() {
-        this.g.selectAll("path")
-            .attr("fill", d => {
-                let zone_type = this.getZoneTitle(d)
-                if (zone_type in this.zone_colors) {
-                    return this.zone_colors[zone_type]
-                } else {
-                    return this.default_zone_color
-                }
-            })
-    }
-
     update_data(new_map_file) {
         this.map_file = new_map_file;
         this.g.selectAll("*").remove();
@@ -354,6 +342,7 @@ class LausanneMap {
         // State variables
         this.is_zoomed = false;
         this.clicked_zone = null;
+        this.colored = false;
 
         // Initialize map
         this.svg = this.init_svg();
@@ -463,16 +452,22 @@ class LausanneMap {
         this.g.selectAll("*").remove();
     }
 
-    color_zones() {
-        this.g.selectAll("path")
-            .attr("fill", d => {
-                let zone_type = this.getZoneTitle(d)
+    get_color_zone(zone) {
+        let zone_type = this.getZoneTitle(zone)
                 if (zone_type in this.zone_colors) {
                     return this.zone_colors[zone_type]
                 } else {
                     return this.default_zone_color
                 }
+    }
+
+    color_zones() {
+        this.g.selectAll("path")
+            .attr("fill", d => {
+                return this.get_color_zone(d)
             })
+
+        this.colored = true
     }
 
     update_data(new_map_file) {
@@ -494,7 +489,8 @@ class LausanneMap {
     onMouseOutZone(zone) {
         if (this.is_zoomed) { return }
 
-        this.fadeToColor(zone, this.default_zone_color)
+        const fade_color = this.colored ? this.get_color_zone(zone) : this.default_zone_color
+        this.fadeToColor(zone, fade_color)
         this.removeZoneTitle()
     }
 
@@ -598,7 +594,8 @@ class LausanneMap {
     }
 
     resetZone(zone) {
-        this.fadeToColor(zone, this.default_zone_color)
+        const fade_color = this.colored ? this.get_color_zone(zone) : this.default_zone_color
+        this.fadeToColor(zone, fade_color)
         this.removeZoneTitle()
     }
 }

@@ -620,28 +620,30 @@ function load_divisions_map() {
     map.load_data();
 }
 
-// run load_network() when page is loaded
-window.onload = function() {
-    load_lausanne_map();
-}
+window.addEventListener('DOMContentLoaded', function() {
+    // run load_network() when page is loaded
+    window.onload = function() {
+        load_lausanne_map();
+    }
+});
 
-// on space bar press, zoom out
-document.onkeydown = function(e) {
-    if (e.keyCode == 77) {
-        // check type of map
-        if (map instanceof LausanneMap) {
-            map.unload_data();
-            load_divisions_map();
-        } else {
-            map.unload_data();
-            load_lausanne_map();
+document.addEventListener('DOMContentLoaded', function() {
+    // on space bar press, zoom out
+    document.onkeydown = function(e) {
+        if (e.keyCode == 77) {
+            if (map instanceof LausanneMap) {
+                map.unload_data();
+                load_divisions_map();
+            } else {
+                map.unload_data();
+                load_lausanne_map();
+            }
+        }
+
+        if (e.keyCode == 67) {
+            if (map instanceof LausanneMap) {
+                map.color_zones()
+            }
         }
     }
-
-    // c for color
-    if (e.keyCode == 67) {
-        if (map instanceof LausanneMap) {
-            map.color_zones()
-        }
-    }
-}
+});
